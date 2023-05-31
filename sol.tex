@@ -130,7 +130,7 @@ and thus $x_{1}(t) \to x_{1_{d}} (t)$ as $t \to \infty$.
 
 \subsection{(b) Adaptive backstepping control (a=1 is unknown)}
 \begin{assumption}
-  $x_{1_{d}}, \dot{x}_{1_{d}}, \ddot{x}_{1_{d}}$ are all bounded.
+  $x_{1_{d}}$ is bounded.
 \end{assumption}
 
 We will introduce a new state $\hat{a}(t) \in \mathbb{R}$ for adaptive control.
@@ -176,13 +176,13 @@ and the estimation error is $\hat{\dot{\hat{x}}}_{2_{d}} - \dot{\hat{x}}_{2_{d}}
 
 Then,
 \begin{align}
-  \label{eq:z_2_hat}
   \hat{z}_{2} \dot{\hat{z}}_{2} &= \hat{z}_{2} (u - \dot{\hat{x}}_{2_{d}})
   \\
                                 &= \hat{z}_{2} (u - \hat{\dot{\hat{x}}}_{2_{d}} - (k_{1} + \hat{a} - 3x_{1}^{2})\tilde{a} x_{1}).
 \end{align}
 Letting $u = \hat{\dot{\hat{x}}}_{2_{d}} - z_{1} - k_{2}\hat{z}_{2}$ implies
 \begin{align}
+  \label{eq:z_2_hat}
   \hat{z}_{2} \dot{\hat{z}}_{2} = -z_{1}\hat{z}_{2} -k_{2} \hat{z}_{2}^{2} - \hat{z}_{2} (k_{1} + \hat{a} - 3 x_{1}^{2}) \tilde{a} x_{1}.
 \end{align}
 
