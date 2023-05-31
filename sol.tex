@@ -1,0 +1,246 @@
+\documentclass{article}
+
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage{thmtools}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{geometry}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{framed}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tcolorbox}
+
+\colorlet{LightGray}{White!90!Periwinkle}
+\colorlet{LightOrange}{Orange!15}
+\colorlet{LightGreen}{Green!15}
+
+\newcommand{\HRule}[1]{\rule{\linewidth}{#1}}
+
+\declaretheoremstyle[name=Assumption,]{thmsty}
+\declaretheorem[style=thmsty,numberwithin=section]{assumption}
+\tcolorboxenvironment{assumption}{colback=LightOrange}
+
+\declaretheoremstyle[name=Theorem,]{thmsty}
+\declaretheorem[style=thmsty,numberwithin=section]{theorem}
+\tcolorboxenvironment{theorem}{colback=LightGray}
+
+\declaretheoremstyle[name=Proposition,]{prosty}
+\declaretheorem[style=prosty,numberlike=theorem]{proposition}
+\tcolorboxenvironment{proposition}{colback=LightOrange}
+
+\declaretheoremstyle[name=Principle,]{prcpsty}
+\declaretheorem[style=prcpsty,numberlike=theorem]{principle}
+\tcolorboxenvironment{principle}{colback=LightGreen}
+
+\setstretch{1.2}
+\geometry{
+    textheight=9in,
+    textwidth=5.5in,
+    top=1in,
+    headheight=12pt,
+    headsep=25pt,
+    footskip=30pt
+}
+
+% ------------------------------------------------------------------------------
+
+\begin{document}
+
+% ------------------------------------------------------------------------------
+% Cover Page and ToC
+% ------------------------------------------------------------------------------
+
+\title{ \normalsize \textsc{}
+		\\ [2.0cm]
+		\HRule{1.5pt} \\
+		\LARGE \textbf{\uppercase{2023 SNU Course Work - Decision Making}
+		\HRule{2.0pt} \\ [0.6cm] \LARGE{HW \#2} \vspace*{10\baselineskip}}
+		}
+\date{}
+\author{\textbf{Authors} \\ 
+  Jinrae Kim with SNU FDCL members\\
+		}
+
+\maketitle
+\newpage
+
+% ------------------------------------------------------------------------------
+
+\section{Problem 2}
+\begin{align}
+  \label{eq:x1_dot}
+  \dot{x}_{1} &= a x_{1} - x_{1}^{3} + x_{2},
+  \\
+  \dot{x}_{2} &= u.
+\end{align}
+$x_{1_{d}}:[0, \infty) \to \mathbb{R}$, desired trajectory of $x_{1}$, is given.
+$a \in \mathbb{R}$ is assumed to be a constant scalar.
+
+\begin{align}
+  z_{1}(t) &:= x_{1}(t) - x_{1_{d}}(t)
+  \\
+  z_{2}(t) &:= x_{2}(t) - x_{2_{d}}(t)
+\end{align}
+Here, $x_{2_{d}}(t)$ is the desired $x_{2}$ by regarding $x_{2}$ in \eqref{eq:x1_dot} as a virtual input,
+which will be designed in each section.
+
+\subsection{(a) Backstepping control (a=1 is known)}
+$x_{1_{d}}$ is assumed to be twice differentiable.
+
+Lyapunov function for the outer-loop control:
+\begin{equation}
+  V_{1} := \frac{1}{2} z_{1}^{2}.
+\end{equation}
+\begin{align}
+  \dot{V}_{1} &:= z_{1} \dot{z}_{1}
+  \\
+              &= z_{1} (x_{2} + a x_{1} - x_{1}^{3} - \dot{x}_{1_{d}}).
+\end{align}
+Let $x_{2_{d}} := -k_{1} z_{1} -(a x_{1}-x_{1}^{3} - \dot{x}_{1_{d}})$ with a positive constant $k_{1} \in \mathbb{R}_{>0}$.
+Then,
+\begin{equation}
+  \dot{V}_{1} = -k_{1} z_{1}^{2} + z_{1} z_{2},
+\end{equation}
+and if $z_{2} = 0$ (exact tracking of $x_{2}$ to $x_{2_{d}}$), the virtual input $x_{2_{d}}$ makes $z_{1} = 0$ a globally asymptotically stable equilibrium point of the outer-loop control system.
+
+Note that the time derivative of $x_{2_{d}}$ is given as follows,
+\begin{equation}
+  \dot{x}_{2_{d}} = -k_{1} (\dot{x}_{1} - \dot{x}_{1_{d}}) - (a \dot{x}_{1} - 3x_{1}^{2} \dot{x}_{1} - \ddot{x}_{1_{d}}),
+\end{equation}
+and this quantity requires the knowledge of $a$.
+
+Now, define the Lyapunov function for the whole control system:
+\begin{equation}
+  V_{2} := V_{1} + \frac{1}{2} z_{2}^{2}.
+\end{equation}
+\begin{align}
+  \dot{V}_{2} &:= -k_{1} z_{1}^{2} + z_{1} z_{2} + z_{2} \dot{z}_{2}
+  \\
+              &= -k_{1} z_{1}^{2} + z_{1} z_{2} + z_{2} (u - \dot{x}_{2_{d}})
+\end{align}
+Letting $u = \dot{x}_{2_{d}} - z_{1} - k_{2} z_{2}$ implies
+\begin{equation}
+  \dot{V}_{2} = -k_{1} z_{1}^{2} - k_{2} z_{2}^{2} \prec 0,
+\end{equation}
+which makes $(z_{1}, z_{2}) = (0, 0)$ a globally asymptotically stable equilibrium point,
+and thus $x_{1}(t) \to x_{1_{d}} (t)$ as $t \to \infty$.
+
+\subsection{(b) Adaptive backstepping control (a=1 is unknown)}
+\begin{assumption}
+  $x_{1_{d}}, \dot{x}_{1_{d}}, \ddot{x}_{1_{d}}$ are all bounded.
+\end{assumption}
+
+We will introduce a new state $\hat{a}(t) \in \mathbb{R}$ for adaptive control.
+Since $a$ is unknown, we modify the virtual input as
+$\hat{x}_{2_{d}} = x_{2_{d}} \vert_{a = \hat{a}} = -k_{1}z_{1} - (\hat{a} x_{1} - x_{1}^{3} - \dot{x}_{1_{d}}) $
+and corresponding error $\hat{z}_{2} := x_{2} - \hat{x}_{2_{d}}$.
+Define the estimation error $\tilde{a} := \hat{a} - a$.
+Also, note for $\hat{\dot{x}}_{1} := \dot{x}_{1} \vert_{a = \hat{a}}$ that
+$\hat{\dot{x}}_{1} - \dot{x}_{1} = \tilde{a} x_{1} $
+Use the following Lyapunov function candidate:
+\begin{equation}
+  V := \frac{1}{2} z_{1}^{2} + \frac{1}{2} \hat{z}_{2}^{2} + \frac{1}{2} \gamma^{-1} \tilde{a}^{2}.
+\end{equation}
+\begin{equation}
+  \dot{V} = z_{1} \dot{z}_{1} + \hat{z}_{2} \dot{\hat{z}}_{2} + \gamma^{-1} \tilde{a} \dot{\hat{a}}
+\end{equation}
+\begin{align}
+  \label{eq:z_1}
+  z_{1} \dot{z}_{1} &= z_{1} (\hat{\dot{x}}_{1} - (\hat{\dot{x}}_{1} - \dot{x}_{1}) - \dot{x}_{1_{d}})
+  \\
+                    &= z_{1} ((\hat{a} x_{1} - x_{1}^{3} + x_{2}) - \tilde{a} x_{1} - \dot{x}_{1_{d}})
+                    \\
+                    &= z_{1} ((\hat{a} x_{1} - x_{1}^{3} + \hat{x}_{2_{d}}) - \tilde{a} x_{1} - \dot{x}_{1_{d}}) + z_{1} \hat{z}_{2}
+                    \\
+                    &= -k_{1} z_{1}^{2} + z_{1} \hat{z}_{2} - z_{1} \tilde{a} x_{1}.
+\end{align}
+
+Note that
+\begin{align}
+  \dot{\hat{x}}_{2_{d}} &= -k_{1} (\dot{x}_{1} - \dot{x}_{1_{d}}) - (\dot{\hat{a}} x_{1} + \hat{a} \dot{x}_{1} - 3x_{1}^{2} \dot{x}_{1} - \ddot{x}_{1_{d}})
+  \\
+                        &= -k_{1} (\hat{\dot{x}}_{1} - \dot{x}_{1_{d}}) - (\dot{\hat{a}} x_{1} + \hat{a} \hat{\dot{x}}_{1} - 3x_{1}^{2} \hat{\dot{x}}_{1} - \ddot{x}_{1_{d}})
+                        + (k_{1} + \hat{a} - 3x_{1}^{2}) (\hat{\dot{x}}_{1} - \dot{x}_{1})
+                        \\
+                        &= -k_{1} (\hat{\dot{x}}_{1} - \dot{x}_{1_{d}}) - (\dot{\hat{a}} x_{1} + \hat{a} \hat{\dot{x}}_{1} - 3x_{1}^{2} \hat{\dot{x}}_{1} - \ddot{x}_{1_{d}})
+                        + (k_{1} + \hat{a} - 3x_{1}^{2}) \tilde{a} x_{1},
+\end{align}
+and define its estimate as
+\begin{equation}
+  \hat{\dot{\hat{x}}}_{2_{d}} := \dot{\hat{x}}_{2_{d}} \vert_{a = \hat{a}} = -k_{1} (\hat{\dot{x}}_{1} - \dot{x}_{1_{d}}) - (\dot{\hat{a}} x_{1} + \hat{a} \hat{\dot{x}}_{1} - 3x_{1}^{2} \hat{\dot{x}}_{1} - \ddot{x}_{1_{d}}),
+\end{equation}
+and the estimation error is $\hat{\dot{\hat{x}}}_{2_{d}} - \dot{\hat{x}}_{2_{d}} = -(k_{1}+\hat{a}-3x_{1}^{2})\tilde{a} x_{1} $.
+
+Then,
+\begin{align}
+  \label{eq:z_2_hat}
+  \hat{z}_{2} \dot{\hat{z}}_{2} &= \hat{z}_{2} (u - \dot{\hat{x}}_{2_{d}})
+  \\
+                                &= \hat{z}_{2} (u - \hat{\dot{\hat{x}}}_{2_{d}} - (k_{1} + \hat{a} - 3x_{1}^{2})\tilde{a} x_{1}).
+\end{align}
+Letting $u = \hat{\dot{\hat{x}}}_{2_{d}} - z_{1} - k_{2}\hat{z}_{2}$ implies
+\begin{align}
+  \hat{z}_{2} \dot{\hat{z}}_{2} = -z_{1}\hat{z}_{2} -k_{2} \hat{z}_{2}^{2} - \hat{z}_{2} (k_{1} + \hat{a} - 3 x_{1}^{2}) \tilde{a} x_{1}.
+\end{align}
+
+Therefore,
+the following adaptive law,
+\begin{equation}
+  \dot{\hat{a}} = \gamma (z_{1} + \hat{z}_{2}(k_{1} + \hat{a} - 3x_{1}^{2})),
+\end{equation}
+implies
+\begin{align}
+  \dot{V} = -k_{1}z_{1}^{2} - k_{2} \hat{z}_{2}^{2} - (z_{1} + \hat{z}_{2}(k_{1} + \hat{a} - 3x_{1}^{2}) ) \tilde{a} x_{1} + \gamma^{-1} \tilde{a} \dot{\hat{a}}
+  = -k_{1}z_{1}^{2} - k_{2} \hat{z}_{2}^{2} \leq 0.
+\end{align}
+
+Note that $V$ is non-increasing,
+and therefore, $z_{1}$, $\hat{z}_{2}$, and $\tilde{a}$ is bounded.
+This also implies that $\hat{a}$ is bounded.
+By assumption, $x_{1} = z_{1} + x_{1_{d}}$ is also bounded.
+Now, observe this:
+\begin{equation}
+  \ddot{V} = -2(k_{1} z_{1}\dot{z}_{1} + k_{2} \hat{z}_{2} \dot{\hat{z}}_{2}).
+\end{equation}
+From \eqref{eq:z_1} and \eqref{eq:z_2_hat},
+$z_{1} \dot{z}_{1}$ and $\hat{z}_{2} \dot{\hat{z}}_{2}$ contains $x_{1}$, $z_{1}$, $\hat{z}_{2}$, $\hat{a}$, $\tilde{a}$ only,
+and therefore, $\ddot{V}$ is bounded.
+
+By Barbalat's lemma, this implies that $\dot{V} \to 0$ as $t \to \infty$, which shows that $(z_{1}, \hat{z}_{2}) = (0, 0)$ is a globally asymptotically stable equilibrium point.
+
+\begin{theorem}[Barbalat's lemma, modified]
+  Given $f: [0, \infty) \to \mathbb{R}$,
+  if $f(t)$ has a finite limit and $\ddot{f}$ is bounded,
+  then $\dot{f} \to 0$ as $t \to \infty$.
+\end{theorem}
+
+% \begin{proposition}
+%     This is a proposition.
+% \end{proposition}
+%
+% \begin{principle}
+%     This is a principle.
+% \end{principle}
+
+% Maybe I need to add one more part: Examples.
+% Set style and colour later.
+
+% \subsection{Pictures}
+%
+% \subsection{Citation}
+
+\newpage
+
+% ------------------------------------------------------------------------------
+% Reference and Cited Works
+% ------------------------------------------------------------------------------
+
+% \bibliographystyle{IEEEtran}
+% \bibliography{References.bib}
+
+% ------------------------------------------------------------------------------
+
+\end{document}
